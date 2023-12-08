@@ -14,10 +14,22 @@ class UserRoles:
         self.cur.execute('CREATE TABLE IF NOT EXISTS roles(role TEXT)')
 
     def add_role(self, role):
-        for value in role:
-            self.cur.execute(f'INSERT INTO roles VALUES("{value}")')
+        query = f'INSERT INTO roles VALUES("{role}")'
+        self.cur.execute(query)
+        if __name__ == '__main__':
             self.con.commit()
+            self.cur.close()
+            return True
 
     def del_role(self, role):
-        self.cur.execute(f'DELETE FROM roles WHERE role="{role}"')
-        self.con.commit()
+        try:
+            query = f'DELETE FROM roles WHERE role=?'
+            self.cur.execute(query, (role,))
+            self.con.commit()
+            self.cur.close()
+            return True
+        except sql.Error as error:
+            return error
+        finally:
+            if self.con:
+                return 'db closed'

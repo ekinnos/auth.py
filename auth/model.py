@@ -14,13 +14,22 @@ class UserModel:
         self.cur.execute(f'INSERT INTO users VALUES("{username}","","{password}")')
         if __name__ == '__main__':
             self.con.commit()
-            self.con.close()
+            self.cur.close()
+            return True
 
     def del_user(self, username):
-        self.cur.execute(f'DELETE FROM users WHERE username="{username}"')
-        if __name__ == '__main__':
+        try:
+            query = 'DELETE FROM users WHERE username=?'
+            self.cur.execute(query, (username,))
             self.con.commit()
-            self.con.close()
+            self.cur.close()
+            return True
+        except sql.Error as error:
+            return error
+        finally:
+            if self.con:
+                self.con.close()
+                return 'db closed'
 
     def load_user(self, username):
         self.cur.execute(f'SELECT * FROM users WHERE username="{username}"')

@@ -17,9 +17,15 @@ class UserManager:
         roles_data = self.roles_cur.fetchall()
         try:
             if role in roles_data:
-                self.users_cur.execute(f'UPDATE users SET role="{role}" WHERE username="{username}"')
+                query = 'UPDATE users SET role=? WHERE username=?'
+                self.cur.execute(query, (role,username,))
                 if __name__ == '__main__':
                     self.users_con.commit()
                     self.users_con.close()
-        except Exception as e:
-            print('Error: ' + e)
+                    return True
+        except sql.Error as error:
+            return error
+        finally:
+            if self.users_con:
+                self.users_con.close()
+                return 'db closed'
